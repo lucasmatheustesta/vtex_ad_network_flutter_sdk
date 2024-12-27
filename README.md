@@ -32,7 +32,7 @@ import 'package:vtex_ad_network/vtex_ad_network.dart';
 
 final vtexAdNetwork = VtexAdNetwork(
   accountName: 'your_account_name',
-  baseUrl: 'https://api.vtex.com',
+  baseUrl: 'your_vtex_base_url',
 );
 ```
 
