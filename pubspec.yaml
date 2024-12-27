@@ -1,0 +1,22 @@
+name: vtex_ad_network
+description: "Plugin to handle VTEX Ad Network SDK"
+version: 0.0.1
+homepage: https://github.com/lucasmatheustesta/vtex_ad_network_flutter_sdk
+
+environment:
+  sdk: '>=3.2.3 <4.0.0'
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^1.2.0
+  shared_preferences: ^2.2.3
+  uuid: ^4.5.1
+  visibility_detector: ^0.4.0+2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+  mockito: ^5.4.4
