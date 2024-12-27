@@ -56,7 +56,7 @@ Retrieve a list of products along with their facets:
 ```dart
 final productsWithFacets = await vtexAdNetwork.getListOfProductsForQuery(
   query: 'electronics',
-  facets: 10,
+  facets: [],
   sponsoredCount: 3,
   advertisementPlacement: AdvertisementPlacement.homeShelf,
 );
