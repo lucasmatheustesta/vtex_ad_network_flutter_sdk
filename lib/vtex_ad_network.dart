@@ -8,6 +8,8 @@ import 'package:uuid/uuid.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'package:vtex_ad_network/helpers/constants.dart';
 
+export 'package:vtex_ad_network/helpers/constants.dart';
+
 class VtexAdNetwork {
   final String accountName;
   final String baseUrl;
@@ -25,7 +27,8 @@ class VtexAdNetwork {
     AdvertisementPlacement advertisementPlacement =
         AdvertisementPlacement.topSearch,
   }) async {
-    final url = Uri.parse('$baseUrl/sponsored_products/facets');
+    final url = Uri.parse(
+        '$baseUrl/api/io/_v/api/intelligent-search/sponsored_products/');
     final response = await http.get(
       url.replace(queryParameters: {
         'query': query,
@@ -122,6 +125,7 @@ class VtexAdNetwork {
     if (response.statusCode != 200) {
       throw Exception('Failed to send ad event');
     }
+    print('Sent ad event: $body');
   }
 
   /// Sends an order event to the server.
@@ -216,7 +220,8 @@ class AdTracker extends StatefulWidget {
   final String adId;
   final Channel channel;
 
-  AdTracker({
+  const AdTracker({
+    super.key,
     required this.child,
     required this.vtexAdNetwork,
     required this.macId,
@@ -231,6 +236,7 @@ class AdTracker extends StatefulWidget {
   });
 
   @override
+  // ignore: library_private_types_in_public_api
   _AdTrackerState createState() => _AdTrackerState();
 }
 
@@ -241,6 +247,7 @@ class _AdTrackerState extends State<AdTracker> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () async {
+        print('Tracking click for ${widget.adId}');
         await widget.vtexAdNetwork.sendAdEvent(
           macId: widget.macId,
           sessionId: widget.sessionId,
@@ -259,6 +266,7 @@ class _AdTrackerState extends State<AdTracker> {
         onVisibilityChanged: (visibilityInfo) async {
           if (!_hasTrackedImpression && visibilityInfo.visibleFraction > 0.5) {
             _hasTrackedImpression = true;
+            print('Tracking impression for ${widget.adId}');
             await widget.vtexAdNetwork.sendAdEvent(
               macId: widget.macId,
               sessionId: widget.sessionId,
