@@ -100,7 +100,7 @@ class VtexAdNetwork {
     int? position,
     required Channel channel,
   }) async {
-    final url = Uri.parse('$baseUrl/api/activity-flow/ads');
+    final url = Uri.parse('https://af-origin.vtex.com/api/activity-flow/ads');
     final body = {
       'MacId': macId,
       'SessionId': sessionId,
@@ -122,6 +122,7 @@ class VtexAdNetwork {
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode(body),
     );
+
     if (response.statusCode != 200) {
       throw Exception('Failed to send ad event');
     }
@@ -144,7 +145,7 @@ class VtexAdNetwork {
     required String url,
     required String ref,
   }) async {
-    final endpoint = '$baseUrl/api/activity-flow/order';
+    const endpoint = 'https://af-origin.vtex.com/api/activity-flow/order';
     final body = {
       'accountName': accountName,
       'macId': macId,

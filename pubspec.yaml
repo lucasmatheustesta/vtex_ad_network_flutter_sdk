@@ -1,6 +1,6 @@
 name: vtex_ad_network
 description: "Plugin to handle VTEX Ad Network SDK"
-version: 0.0.4
+version: 0.0.5
 homepage: https://github.com/lucasmatheustesta/vtex_ad_network_flutter_sdk
 
 environment:
