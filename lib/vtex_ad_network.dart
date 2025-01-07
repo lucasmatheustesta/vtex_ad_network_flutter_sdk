@@ -1,5 +1,6 @@
 library vtex_ad_network;
 
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
@@ -243,6 +244,46 @@ class AdTracker extends StatefulWidget {
 
 class _AdTrackerState extends State<AdTracker> {
   bool _hasTrackedImpression = false;
+  Timer? _visibilityTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    // Quando renderizado, rastreia a impressão do anúncio
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      widget.vtexAdNetwork.sendAdEvent(
+        macId: widget.macId,
+        sessionId: widget.sessionId,
+        adRequestId: widget.adRequestId,
+        adResponseId: widget.adResponseId,
+        actionType: ActionType.impression,
+        productId: widget.productId,
+        productName: widget.productName,
+        campaignId: widget.campaignId,
+        adId: widget.adId,
+        channel: widget.channel,
+      );
+    });
+  }
+
+  void _trackView() async {
+    if (_hasTrackedImpression) return;
+
+    _hasTrackedImpression = true;
+    print('Tracking view for ${widget.adId}');
+    await widget.vtexAdNetwork.sendAdEvent(
+      macId: widget.macId,
+      sessionId: widget.sessionId,
+      adRequestId: widget.adRequestId,
+      adResponseId: widget.adResponseId,
+      actionType: ActionType.view,
+      productId: widget.productId,
+      productName: widget.productName,
+      campaignId: widget.campaignId,
+      adId: widget.adId,
+      channel: widget.channel,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -265,21 +306,22 @@ class _AdTrackerState extends State<AdTracker> {
       child: VisibilityDetector(
         key: Key(widget.adId),
         onVisibilityChanged: (visibilityInfo) async {
-          if (!_hasTrackedImpression && visibilityInfo.visibleFraction > 0.5) {
-            _hasTrackedImpression = true;
-            print('Tracking impression for ${widget.adId}');
-            await widget.vtexAdNetwork.sendAdEvent(
-              macId: widget.macId,
-              sessionId: widget.sessionId,
-              adRequestId: widget.adRequestId,
-              adResponseId: widget.adResponseId,
-              actionType: ActionType.impression,
-              productId: widget.productId,
-              productName: widget.productName,
-              campaignId: widget.campaignId,
-              adId: widget.adId,
-              channel: widget.channel,
-            );
+          if (_hasTrackedImpression) return;
+
+          // Visível por mais de 50% (condição 1)
+          if (visibilityInfo.visibleFraction > 0.5) {
+            _trackView();
+          } else {
+            // Visível por pelo menos 1 segundo (condição 2)
+            _visibilityTimer ??= Timer(const Duration(seconds: 1), () {
+              _trackView();
+            });
+          }
+
+          // Cancela o temporizador caso a visibilidade caia abaixo de 50%
+          if (visibilityInfo.visibleFraction <= 0.5) {
+            _visibilityTimer?.cancel();
+            _visibilityTimer = null;
           }
         },
         child: widget.child,
